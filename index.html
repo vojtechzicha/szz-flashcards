@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SZZ Kartičky">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+  <link rel="stylesheet" href="styles.css">
+  <title>SZZ Kartičky – Globální podnikání a management</title>
+</head>
+<body>
+
+  <!-- Home Screen -->
+  <div id="screen-home" class="screen active">
+    <header class="app-header">
+      <h1>SZZ Kartičky</h1>
+      <p class="subtitle">Globální podnikání a management</p>
+    </header>
+    <div class="home-buttons">
+      <a href="#/study/all" class="home-btn home-btn--all">
+        <span class="home-btn__icon">📚</span>
+        <span class="home-btn__label">Všechny kartičky</span>
+        <span class="home-btn__count" id="home-count-all"></span>
+      </a>
+      <a href="#/questions" class="home-btn home-btn--questions">
+        <span class="home-btn__icon">❓</span>
+        <span class="home-btn__label">Podle otázek</span>
+        <span class="home-btn__count">20 otázek</span>
+      </a>
+      <a href="#/subjects" class="home-btn home-btn--subjects">
+        <span class="home-btn__icon">📖</span>
+        <span class="home-btn__label">Podle předmětů</span>
+        <span class="home-btn__count">9 předmětů</span>
+      </a>
+    </div>
+    <div class="home-progress" id="home-progress"></div>
+    <a href="#/stats" class="stats-link">📊 Statistiky</a>
+  </div>
+
+  <!-- Questions List Screen -->
+  <div id="screen-questions" class="screen">
+    <header class="list-header">
+      <a href="#/" class="back-btn">← Zpět</a>
+      <h2>Otázky</h2>
+    </header>
+    <div class="list-container" id="questions-list"></div>
+  </div>
+
+  <!-- Subjects List Screen -->
+  <div id="screen-subjects" class="screen">
+    <header class="list-header">
+      <a href="#/" class="back-btn">← Zpět</a>
+      <h2>Předměty</h2>
+    </header>
+    <div class="list-container" id="subjects-list"></div>
+  </div>
+
+  <!-- Study Screen -->
+  <div id="screen-study" class="screen">
+    <header class="study-header">
+      <a href="#/" class="back-btn" id="study-back">← Zpět</a>
+      <div class="study-title" id="study-title"></div>
+      <div class="study-counter" id="study-counter"></div>
+    </header>
+    <div class="study-progress-bar">
+      <div class="study-progress-fill" id="study-progress-fill"></div>
+    </div>
+    <div class="card-area" id="card-area">
+      <div class="card" id="card">
+        <div class="card-inner" id="card-inner">
+          <div class="card-front" id="card-front"></div>
+          <div class="card-back" id="card-back"></div>
+        </div>
+      </div>
+      <div class="flip-hint" id="flip-hint">Klikni pro otočení</div>
+    </div>
+    <div class="study-controls">
+      <button class="ctrl-btn ctrl-btn--prev" id="btn-prev" title="Předchozí (←)">‹</button>
+      <button class="ctrl-btn ctrl-btn--unknown" id="btn-unknown" title="Nevím (2)">✗ Nevím</button>
+      <button class="ctrl-btn ctrl-btn--known" id="btn-known" title="Vím (1)">✓ Vím</button>
+      <button class="ctrl-btn ctrl-btn--next" id="btn-next" title="Další (→)">›</button>
+    </div>
+    <div class="study-toolbar">
+      <button class="tool-btn" id="btn-shuffle" title="Zamíchat">🔀 Zamíchat</button>
+      <button class="tool-btn" id="btn-filter" title="Filtr">🔍 Filtr</button>
+    </div>
+    <div class="filter-menu hidden" id="filter-menu">
+      <button class="filter-opt active" data-filter="all">Všechny</button>
+      <button class="filter-opt" data-filter="unseen">Neviděné</button>
+      <button class="filter-opt" data-filter="unknown">Nevím</button>
+      <button class="filter-opt" data-filter="known">Vím</button>
+    </div>
+  </div>
+
+  <!-- Stats Screen -->
+  <div id="screen-stats" class="screen">
+    <header class="list-header">
+      <a href="#/" class="back-btn">← Zpět</a>
+      <h2>Statistiky</h2>
+    </header>
+    <div class="stats-container" id="stats-container"></div>
+  </div>
+
+  <script src="flashcards.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
