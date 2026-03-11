@@ -1,0 +1,13 @@
+:8080 {
+	root * /srv
+	file_server
+
+	header {
+		Cache-Control "public, max-age=3600"
+		X-Content-Type-Options "nosniff"
+	}
+
+	header /sw.js {
+		Cache-Control "no-cache"
+	}
+}
