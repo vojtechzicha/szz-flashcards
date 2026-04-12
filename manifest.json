@@ -4,8 +4,8 @@
   "description": "Flashcard app pro přípravu na SZZ – Globální podnikání a management",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#1a1a2e",
-  "theme_color": "#1a1a2e",
+  "background_color": "#0c0c0e",
+  "theme_color": "#0c0c0e",
   "orientation": "any",
   "icons": [
     {
