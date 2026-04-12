@@ -1,4 +1,4 @@
-name: Deploy to Fly.io
+name: Deploy to Netlify
 
 on:
   push:
@@ -11,8 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-
-      - run: flyctl deploy --remote-only
+      - run: npx netlify-cli deploy --prod --dir=.
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
