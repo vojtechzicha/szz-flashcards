@@ -1,8 +1,10 @@
+import { cookies } from 'next/headers'
 import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
 import { getPayload } from 'payload'
 
 import config from './payload.config'
+import { mintPayloadCookieForEmail } from './lib/auth/payload-cookie-bridge'
 
 /**
  * Auth.js (NextAuth v5) wired to use Payload as the user store.
@@ -57,6 +59,16 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           data: { googleId: googleSub },
           overrideAccess: true,
         })
+      }
+
+      // Stamp Payload's auth cookie now so `/admin` is reachable in the
+      // same browser session. `cookies().set()` works here because the
+      // signIn callback runs inside the OAuth callback Route Handler,
+      // during request handling.
+      const cookie = await mintPayloadCookieForEmail(email)
+      if (cookie) {
+        const cookieStore = await cookies()
+        cookieStore.set(cookie)
       }
       return true
     },

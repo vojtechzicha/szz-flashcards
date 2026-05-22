@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAdmin, isAdminFieldLevel, isAdminOrSelf } from '@/access'
+import { clearAuthJsOnLogout } from './hooks/clearAuthJsOnLogout'
 import { promoteFirstUser } from './hooks/promoteFirstUser'
 import { syncLanguageOnChange, syncLanguageOnLogin } from './hooks/syncLanguagePreference'
 import { syncThemeOnChange, syncThemeOnLogin } from './hooks/syncThemePreference'
@@ -33,6 +34,7 @@ export const Users: CollectionConfig = {
     beforeChange: [promoteFirstUser],
     afterChange: [syncLanguageOnChange, syncThemeOnChange],
     afterLogin: [syncLanguageOnLogin, syncThemeOnLogin],
+    afterLogout: [clearAuthJsOnLogout],
   },
   fields: [
     {
