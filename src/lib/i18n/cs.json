@@ -1,0 +1,61 @@
+{
+  "app.title": "SZZ Kartičky",
+  "app.tagline": "Učení v klidu",
+  "nav.home": "Domů",
+  "nav.stats": "Statistiky",
+  "nav.signOut": "Odhlásit se",
+  "nav.admin": "Administrace",
+  "lang.toggle": "Přepnout jazyk",
+  "theme.toggle": "Přepnout vzhled",
+  "theme.dark": "Tmavý režim",
+  "theme.light": "Světlý režim",
+
+  "auth.signInTitle": "Přihlášení",
+  "auth.signInWithGoogle": "Přihlásit se přes Google",
+  "auth.email": "E-mail",
+  "auth.password": "Heslo",
+  "auth.signIn": "Přihlásit se",
+  "auth.notAuthorized": "Tento účet nemá přístup. Požádejte správce o pozvánku.",
+  "auth.invalidCredentials": "Nesprávné přihlašovací údaje.",
+
+  "home.title": "Studia",
+  "home.empty": "Zatím tu nejsou žádná studia. Přidejte je v administraci.",
+
+  "study.subjects": "Předměty",
+  "study.studyAll": "Studovat vše",
+  "subject.topics": "Témata",
+  "subject.studyAll": "Studovat všechny kartičky",
+  "topic.study": "Studovat toto téma",
+
+  "mode.choose": "Vyber režim",
+  "mode.tutorial": "Průchod",
+  "mode.tutorial.desc": "Postupně, každá kartička jednou.",
+  "mode.learning": "Učení",
+  "mode.learning.desc": "Promíchané, neznámé se vrací, dokud je nezvládneš.",
+
+  "card.flipHint": "Klikni pro otočení · Mezerník",
+  "card.known": "Vím",
+  "card.unknown": "Nevím",
+  "card.progress": "{current} / {total}",
+
+  "session.complete": "Hotovo",
+  "session.completeMsg": "Dokončil jsi celé sezení.",
+  "session.startAgain": "Spustit znovu",
+  "session.backHome": "Zpět",
+  "session.knownSoFar": "Známé",
+  "session.unknownSoFar": "Neznámé",
+
+  "stats.title": "Statistiky",
+  "stats.total": "Celkem",
+  "stats.known": "Známé",
+  "stats.unknown": "Neznámé",
+  "stats.unseen": "Neviděné",
+  "stats.bySubject": "Podle předmětu",
+  "stats.reset": "Resetovat pokrok",
+  "stats.resetConfirm": "Opravdu chceš smazat veškerý pokrok?",
+
+  "common.back": "Zpět",
+  "common.cancel": "Zrušit",
+  "common.confirm": "Potvrdit",
+  "common.loading": "Načítání…"
+}

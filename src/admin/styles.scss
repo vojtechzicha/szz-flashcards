@@ -1,0 +1,196 @@
+/* Re-skin the Payload admin to match the app's "Midnight Library" palette.
+   We only override CSS custom properties — no DOM/component overrides — so
+   Payload upgrades remain low-friction. */
+
+/* Card visual rules shared with the app frontend live in
+   src/styles/card-presentation.css. We import them from custom.scss
+   (the Payload admin's CSS entry) rather than here, so the relative
+   path is unambiguous to PostCSS. */
+
+/* Shared (theme-agnostic) accents — amber accent, semantic colors.
+   Apply to both light and dark so we don't have to repeat them. */
+:root[data-theme="dark"],
+:root[data-theme="light"] {
+  --color-success-500: #5cb87a;
+  --color-success-100: rgba(92, 184, 122, 0.12);
+  --color-warning-500: #e8b86d;
+  --color-warning-100: rgba(232, 184, 109, 0.12);
+  --color-error-500: #d4564e;
+  --color-error-100: rgba(212, 86, 78, 0.12);
+
+  /* Warm amber accent everywhere Payload uses --theme-success / link colors */
+  --theme-success: #d4943a;
+  --theme-success-100: rgba(212, 148, 58, 0.12);
+
+  /* Buttons + active states */
+  --color-info-500: #d4943a;
+  --color-info-100: rgba(212, 148, 58, 0.12);
+}
+
+/* Dark — "Midnight Library" palette matching the app. */
+:root[data-theme="dark"] {
+  --theme-bg: #0c0c0e;
+  --theme-input-bg: #141416;
+  --theme-elevation-0: #0c0c0e;
+  --theme-elevation-50: #141416;
+  --theme-elevation-100: #1c1c20;
+  --theme-elevation-150: #242428;
+  --theme-elevation-200: #2c2c32;
+  --theme-elevation-250: #34343a;
+  --theme-elevation-300: #3c3c42;
+  --theme-elevation-400: #44444a;
+  --theme-elevation-500: #5a5a62;
+  --theme-elevation-600: #8a8580;
+  --theme-elevation-650: #aaa5a0;
+  --theme-elevation-700: #c8c4be;
+  --theme-elevation-800: #e8e4de;
+  --theme-elevation-900: #f5f2ee;
+  --theme-elevation-1000: #ffffff;
+
+  --theme-text: #e8e4de;
+  --theme-text-light: #8a8580;
+
+  --color-base-0: #0c0c0e;
+  --color-base-50: #141416;
+  --color-base-100: #1c1c20;
+  --color-base-1000: #f5f2ee;
+}
+
+/* Light — cool neutral chrome matching the app's light palette.
+   Elevation scale is inverted (0 = lightest bg, 1000 = darkest text). */
+:root[data-theme="light"] {
+  --theme-bg: #eef0f3;
+  --theme-input-bg: #ffffff;
+  --theme-elevation-0: #eef0f3;
+  --theme-elevation-50: #ffffff;
+  --theme-elevation-100: #f5f6f8;
+  --theme-elevation-150: #e4e7ec;
+  --theme-elevation-200: #d8dce2;
+  --theme-elevation-250: #c8ccd2;
+  --theme-elevation-300: #b8bcc2;
+  --theme-elevation-400: #98a0a8;
+  --theme-elevation-500: #7a8088;
+  --theme-elevation-600: #5a5d63;
+  --theme-elevation-650: #4a4d53;
+  --theme-elevation-700: #3a3d43;
+  --theme-elevation-800: #2a2d33;
+  --theme-elevation-900: #1a1c20;
+  --theme-elevation-1000: #0a0c10;
+
+  --theme-text: #1a1c20;
+  --theme-text-light: #5a5d63;
+
+  --color-base-0: #ffffff;
+  --color-base-50: #f5f6f8;
+  --color-base-100: #e4e7ec;
+  --color-base-1000: #1a1c20;
+}
+
+.template-default__wrap,
+body {
+  background: var(--theme-bg);
+}
+
+/* Make the dashboard cards match the app's elevated-surface feel */
+:root[data-theme="dark"] .dashboard__group .card {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+:root[data-theme="light"] .dashboard__group .card {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Subtle accent on focus outlines (consistent with the app) */
+.field-type input:focus,
+.field-type textarea:focus,
+.field-type select:focus {
+  outline-color: #d4943a;
+}
+
+/* Empty-side placeholder used inside the sidebar preview. */
+.flashcard-preview__empty {
+  display: block;
+  color: var(--theme-elevation-500);
+  font-style: italic;
+}
+
+/* Sidebar preview — two stacked static faces (front + back). */
+.flashcard-sidebar-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.flashcard-sidebar-preview__section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.flashcard-sidebar-preview__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--theme-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* MathField (math block latex editor) — label + Visual/Source toggle row. */
+.math-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.math-field-toggle {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: var(--style-radius-s);
+  border: 1px solid var(--theme-elevation-150);
+  background: var(--theme-elevation-50);
+  color: var(--theme-text-light);
+  cursor: pointer;
+}
+
+.math-field-toggle[aria-pressed='true'] {
+  color: var(--theme-text);
+  border-color: var(--theme-success);
+}
+
+/* In-editor chip preview for the inline math block (mathInline.Label). */
+.math-inline-label {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.math-inline-label--empty,
+.math-inline-label--error {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+  color: var(--theme-text-light);
+}
+
+.math-field-loading {
+  padding: 10px;
+  color: var(--theme-text-light);
+  font-style: italic;
+  background: var(--theme-input-bg);
+  border: 1px dashed var(--theme-elevation-150);
+  border-radius: var(--style-radius-s);
+}
+
+/* Hide Payload's standalone Account-page Language picker so the user record's
+   `preferredLanguage` field stays the single visible control. The reverse-sync
+   hook in payload.config.ts still mirrors any direct prefs writes back to the
+   user record — this CSS just removes the redundant UI. */
+.account-language,
+[data-language-picker],
+.payload-account__language,
+.account-form__language {
+  display: none !important;
+}

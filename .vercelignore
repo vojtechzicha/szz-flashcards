@@ -1,0 +1,5 @@
+legacy
+docker-compose.yml
+.env
+.env.local
+.env.*.local

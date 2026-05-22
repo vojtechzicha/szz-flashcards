@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0c0c0e"/>
+
+  <!-- back card -->
+  <rect x="118" y="146" width="276" height="332" rx="28"
+        fill="#1c1c20" stroke="#8a6225" stroke-width="4" opacity="0.55"
+        transform="rotate(-8 256 312)"/>
+
+  <!-- middle card -->
+  <rect x="118" y="118" width="276" height="332" rx="28"
+        fill="#1c1c20" stroke="#d4943a" stroke-width="4" opacity="0.8"
+        transform="rotate(-3 256 284)"/>
+
+  <!-- front card (parchment) -->
+  <rect x="118" y="90" width="276" height="332" rx="28"
+        fill="#faf6ef" stroke="#d4943a" stroke-width="5"/>
+
+  <!-- SZZ wordmark -->
+  <text x="256" y="270" font-family="system-ui,-apple-system,Segoe UI,sans-serif"
+        font-size="120" font-weight="800" fill="#0c0c0e"
+        text-anchor="middle" letter-spacing="-2">SZZ</text>
+
+  <!-- amber underline -->
+  <rect x="186" y="296" width="140" height="8" rx="4" fill="#d4943a"/>
+</svg>

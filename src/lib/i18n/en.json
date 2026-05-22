@@ -1,0 +1,61 @@
+{
+  "app.title": "SZZ Flashcards",
+  "app.tagline": "Calm learning",
+  "nav.home": "Home",
+  "nav.stats": "Stats",
+  "nav.signOut": "Sign out",
+  "nav.admin": "Admin",
+  "lang.toggle": "Toggle language",
+  "theme.toggle": "Toggle theme",
+  "theme.dark": "Dark mode",
+  "theme.light": "Light mode",
+
+  "auth.signInTitle": "Sign in",
+  "auth.signInWithGoogle": "Sign in with Google",
+  "auth.email": "Email",
+  "auth.password": "Password",
+  "auth.signIn": "Sign in",
+  "auth.notAuthorized": "This account is not allowed. Ask an admin to invite you.",
+  "auth.invalidCredentials": "Invalid credentials.",
+
+  "home.title": "Studies",
+  "home.empty": "No studies yet. Create some in the admin.",
+
+  "study.subjects": "Subjects",
+  "study.studyAll": "Study everything",
+  "subject.topics": "Topics",
+  "subject.studyAll": "Study all cards",
+  "topic.study": "Study this topic",
+
+  "mode.choose": "Pick a mode",
+  "mode.tutorial": "Tutorial",
+  "mode.tutorial.desc": "In order, each card once.",
+  "mode.learning": "Learning",
+  "mode.learning.desc": "Shuffled — unknown cards keep coming back until you know them.",
+
+  "card.flipHint": "Click to flip · Spacebar",
+  "card.known": "I know",
+  "card.unknown": "I don't",
+  "card.progress": "{current} / {total}",
+
+  "session.complete": "Done",
+  "session.completeMsg": "You finished the whole session.",
+  "session.startAgain": "Start again",
+  "session.backHome": "Back",
+  "session.knownSoFar": "Known",
+  "session.unknownSoFar": "Unknown",
+
+  "stats.title": "Statistics",
+  "stats.total": "Total",
+  "stats.known": "Known",
+  "stats.unknown": "Unknown",
+  "stats.unseen": "Unseen",
+  "stats.bySubject": "By subject",
+  "stats.reset": "Reset progress",
+  "stats.resetConfirm": "Really delete all progress?",
+
+  "common.back": "Back",
+  "common.cancel": "Cancel",
+  "common.confirm": "Confirm",
+  "common.loading": "Loading…"
+}

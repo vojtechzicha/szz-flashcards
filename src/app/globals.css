@@ -1,0 +1,90 @@
+@import "tailwindcss";
+@import "katex/dist/katex.min.css";
+@import "../styles/card-presentation.css";
+
+/* Design tokens live on :root (not @theme) so runtime overrides via
+   [data-theme] reliably win — @theme can inline values into utilities
+   at build time, breaking theme switching. We only use arbitrary
+   utilities like `bg-[color:var(--color-foo)]`, so none of these
+   variables need to be registered as Tailwind design tokens. */
+:root {
+  --color-bg-base: #0c0c0e;
+  --color-bg-surface: #141416;
+  --color-bg-elevated: #1c1c20;
+  --color-bg-hover: #242428;
+  --color-bg-inset: #0a0a0c;
+
+  --color-accent: #d4943a;
+  --color-accent-bright: #e8b86d;
+  --color-accent-dim: #8a6225;
+
+  --color-good: #5cb87a;
+  --color-bad: #d4564e;
+  --color-warn: #e8b86d;
+
+  --color-text: #e8e4de;
+  --color-text-dim: #8a8580;
+  --color-text-faint: #555250;
+
+  --color-card-bg: #faf6ef;
+  --color-card-text: #1a1816;
+
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(255, 255, 255, 0.1);
+  --color-border-accent: rgba(212, 148, 58, 0.25);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 100px;
+
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Light theme — cool neutral chrome so the warm parchment card stays distinctive.
+   Accent amber is left untouched; it reads well on both palettes. */
+:root[data-theme='light'] {
+  --color-bg-base: #eef0f3;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #ffffff;
+  --color-bg-hover: #e4e7ec;
+  --color-bg-inset: #dde1e7;
+
+  --color-text: #1a1c20;
+  --color-text-dim: #5a5d63;
+  --color-text-faint: #8a8d93;
+
+  --color-card-bg: #fdf6e3;
+  --color-card-text: #1a1816;
+
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-hover: rgba(0, 0, 0, 0.14);
+  --color-border-accent: rgba(212, 148, 58, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-outfit), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  background: var(--color-bg-base);
+  color: var(--color-text);
+  min-height: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Card surface, flip mechanics, and formula primitives live in
+   src/styles/card-presentation.css (imported at the top of this file)
+   so the Payload admin can render the same look. */

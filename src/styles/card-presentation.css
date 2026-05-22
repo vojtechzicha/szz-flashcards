@@ -1,0 +1,139 @@
+/* Shared visual presentation for the flashcard surface.
+   Loaded by both the app (globals.css) and the Payload admin
+   (admin/styles.scss) so a card looks identical in both contexts.
+   The React shell lives in src/components/Flashcard.tsx. */
+
+/* Scope tokens with safe fallbacks so the admin doesn't need to
+   redeclare them. The app's globals.css owns the canonical :root
+   tokens, which still take precedence inside the app. */
+.flashcard-scope {
+  --flashcard-bg: var(--color-card-bg, #faf6ef);
+  --flashcard-text: var(--color-card-text, #1a1816);
+  --flashcard-accent: var(--color-accent, #d4943a);
+  --flashcard-accent-dim: var(--color-accent-dim, #8a6225);
+  --flashcard-radius: 1rem;
+  --flashcard-radius-sm: 8px;
+  --flashcard-radius-pill: 100px;
+  --flashcard-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-flip {
+  perspective: 1500px;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s var(--flashcard-ease);
+}
+
+.card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--flashcard-radius);
+  background: var(--flashcard-bg);
+  color: var(--flashcard-text);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  padding: 1.5rem;
+  overflow: auto;
+}
+
+@media (min-width: 640px) {
+  .card-face {
+    padding: 2.5rem;
+  }
+}
+
+.card-face.card-back {
+  transform: rotateY(180deg);
+}
+
+/* Static face for previews shown outside the flip container.
+   Shares the same surface look, but flows in normal layout. */
+.card-face-static {
+  position: relative;
+  border-radius: var(--flashcard-radius);
+  background: var(--flashcard-bg);
+  color: var(--flashcard-text);
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.25);
+  padding: 14px 16px;
+  overflow: auto;
+}
+
+/* Compact, fixed-height variant used in the admin sidebar. */
+.card-face-static--mini {
+  max-height: 180px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.card-face-static--mini .card-body {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.card-body {
+  font-size: 1rem;
+  line-height: 1.625;
+}
+
+/* Math is rendered by KaTeX (see src/lexical/render.tsx). KaTeX's own CSS
+   (imported in globals.css / custom.scss) supplies all the typography for
+   the .katex* internals. The wrapper classes below just give the block
+   variant a card-friendly framed look. */
+.math-block {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: var(--flashcard-radius-sm);
+  padding: 12px 14px;
+  margin: 10px 0;
+  overflow-x: auto;
+}
+
+.card-back .math-block {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.math-inline {
+  display: inline-block;
+  padding: 0 2px;
+}
+
+.math-error {
+  color: #b3261e;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+}
+
+.tag {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--flashcard-accent-dim), var(--flashcard-accent));
+  color: #fff;
+  font-family: var(--font-outfit), sans-serif;
+  font-size: 0.66rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--flashcard-radius-pill);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Default sizing for callers that don't supply their own. Used by the
+   admin card preview; the app's LearnSession applies its own
+   responsive aspect ratio. */
+.flashcard-frame {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 60vh;
+}

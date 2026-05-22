@@ -1,0 +1,8 @@
+/* KaTeX renders the math blocks — needed for the admin sidebar preview too. */
+@import 'katex/dist/katex.min.css';
+
+/* Shared card visual rules (same partial the app's globals.css imports). */
+@import '../../styles/card-presentation.css';
+
+/* Admin theme overrides + card-preview chrome. */
+@import '../../admin/styles.scss';

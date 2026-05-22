@@ -1,0 +1,51 @@
+{
+  "name": "szz-flashcards",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "db": "docker compose up -d mongo",
+    "db:stop": "docker compose down",
+    "dev": "WAS_RUNNING=$(docker compose ps -q mongo 2>/dev/null); docker compose up -d mongo && trap '[ -z \"$WAS_RUNNING\" ] && docker compose down' EXIT && next dev",
+    "devsafe": "rm -rf .next && next dev",
+    "build": "payload generate:importmap && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "generate:types": "payload generate:types",
+    "seed": "tsx --tsconfig tsconfig.seed.json src/seed/seed-szz.ts"
+  },
+  "dependencies": {
+    "@payloadcms/db-mongodb": "^3.84.0",
+    "@payloadcms/next": "^3.84.0",
+    "@payloadcms/richtext-lexical": "^3.84.0",
+    "@payloadcms/translations": "^3.84.0",
+    "@payloadcms/ui": "^3.84.0",
+    "clsx": "^2.1.1",
+    "isomorphic-dompurify": "^2.30.0",
+    "katex": "^0.16.47",
+    "lexical": "0.41.0",
+    "mathlive": "^0.109.2",
+    "next": "^16.2.0",
+    "next-auth": "5.0.0-beta.31",
+    "node-html-parser": "^7.0.1",
+    "payload": "^3.84.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwind-merge": "^3.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/katex": "^0.16.8",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "tailwindcss": "^4.1.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=20.18.0"
+  },
+  "packageManager": "pnpm@11.2.1"
+}
