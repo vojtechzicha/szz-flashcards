@@ -22,7 +22,7 @@ export default async function SignInPage({
     <main className="min-h-dvh grid place-items-center px-4">
       <div className="w-full max-w-sm rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-bg-elevated)]/40 p-6 sm:p-8">
         <h1 className="text-2xl font-semibold tracking-tight mb-1">{t('auth.signInTitle')}</h1>
-        <p className="text-sm text-[color:var(--color-text-dim)] mb-6">SZZ Flashcards</p>
+        <p className="text-sm text-[color:var(--color-text-dim)] mb-6">Study Cards</p>
         {errorKey ? (
           <div className="mb-4 rounded-md border border-[color:var(--color-bad)]/40 bg-[color:var(--color-bad)]/10 text-[color:var(--color-bad)] px-3 py-2 text-sm">
             {errorKey}

@@ -15,10 +15,10 @@
   <rect x="118" y="90" width="276" height="332" rx="28"
         fill="#faf6ef" stroke="#d4943a" stroke-width="5"/>
 
-  <!-- SZZ wordmark -->
+  <!-- Study Cards wordmark -->
   <text x="256" y="270" font-family="system-ui,-apple-system,Segoe UI,sans-serif"
-        font-size="120" font-weight="800" fill="#0c0c0e"
-        text-anchor="middle" letter-spacing="-2">SZZ</text>
+        font-size="140" font-weight="800" fill="#0c0c0e"
+        text-anchor="middle" letter-spacing="-4">SC</text>
 
   <!-- amber underline -->
   <rect x="186" y="296" width="140" height="8" rx="4" fill="#d4943a"/>

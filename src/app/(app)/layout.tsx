@@ -11,8 +11,8 @@ import { Header } from '@/components/Header'
 const outfit = Outfit({ subsets: ['latin', 'latin-ext'], variable: '--font-outfit' })
 
 export const metadata: Metadata = {
-  title: 'SZZ Flashcards',
-  description: 'Flashcards for SZZ exam prep — Globální podnikání a management.',
+  title: 'Study Cards',
+  description: 'A calm multi-deck flashcard app for studying anything.',
 }
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {

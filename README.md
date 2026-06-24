@@ -1,4 +1,4 @@
-# SZZ Flashcards
+# Study Cards
 
 Multi-deck flashcard study app with Payload CMS backend, MongoDB, and a bilingual (CS/EN) Next.js frontend.
 
