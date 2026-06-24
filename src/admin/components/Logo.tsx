@@ -12,7 +12,7 @@ export default function Logo() {
         <rect x="3" y="6" width="22" height="20" rx="3" fill="#d4943a" />
         <rect x="7" y="3" width="22" height="20" rx="3" fill="#0c0c0e" stroke="#d4943a" strokeWidth="1.5" />
       </svg>
-      <span style={{ fontWeight: 600, letterSpacing: '-0.01em' }}>SZZ Flashcards</span>
+      <span style={{ fontWeight: 600, letterSpacing: '-0.01em' }}>Study Cards</span>
     </div>
   )
 }

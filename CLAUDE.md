@@ -1,4 +1,4 @@
-# SZZ Flashcards
+# Study Cards
 
 Multi-deck flashcard study app: Next.js 16 + Payload CMS 3 (single repo, single deployment) on top of MongoDB.
 

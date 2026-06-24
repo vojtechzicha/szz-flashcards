@@ -20,7 +20,7 @@ import { cardBlocks, cardInlineBlocks } from './blocks'
  * Rich-text editor used for Card front/back fields.
  *
  * Built-in features cover everything the legacy 302 cards use except for
- * the two SZZ-specific primitives (LaTeX math block, inline tag pill),
+ * the two custom primitives (LaTeX math block, inline tag pill),
  * which are exposed as Payload Blocks (toolbar "+" button).
  *
  * The math block accepts standard LaTeX and is rendered with KaTeX
