@@ -3,6 +3,7 @@ import type { Block } from 'payload'
 export const mathBlockSlug = 'math'
 export const mathInlineSlug = 'mathInline'
 export const tagBlockSlug = 'tag'
+export const codeBlockSlug = 'code'
 
 const latexField = {
   name: 'latex',
@@ -74,5 +75,38 @@ export const tagBlock: Block = {
   ],
 }
 
-export const cardBlocks = [mathBlock]
+/**
+ * Block-level code listing (e.g. NetLogo procedures). Rendered as a monospace
+ * <pre> that keeps whitespace; no syntax highlighting.
+ */
+export const codeBlock: Block = {
+  slug: codeBlockSlug,
+  labels: {
+    singular: { en: 'Code', cs: 'Kód' },
+    plural: { en: 'Code', cs: 'Kód' },
+  },
+  imageAltText: 'Code',
+  fields: [
+    {
+      name: 'language',
+      type: 'text',
+      label: { en: 'Language', cs: 'Jazyk' },
+      admin: {
+        description: {
+          en: 'Optional label, e.g. netlogo, python, sql.',
+          cs: 'Nepovinný štítek, např. netlogo, python, sql.',
+        },
+      },
+    },
+    {
+      name: 'code',
+      type: 'code',
+      required: true,
+      label: { en: 'Code', cs: 'Kód' },
+      admin: { language: 'plaintext' },
+    },
+  ],
+}
+
+export const cardBlocks = [mathBlock, codeBlock]
 export const cardInlineBlocks = [mathInlineBlock, tagBlock]

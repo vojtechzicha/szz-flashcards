@@ -112,6 +112,38 @@ describe('markdownToLexical', () => {
     expect(sig.children[0].children).toEqual([{ t: 'Stojí 5 $ a 10 $, soubor my_var_name, *hvězda*', f: 0 }])
   })
 
+  it('keeps fenced code verbatim, with an optional language', () => {
+    const source = [
+      '- `random n`: náhodné **celé číslo od 0 do n − 1**',
+      '',
+      '```netlogo',
+      'to setup',
+      '  set heading one-of [0 90 180 270]',
+      '  if random 100 < 3 [ set pcolor green ] ; *not* $math$ <tag>x</tag>',
+      'end',
+      '```',
+    ].join('\n')
+    const sig = signature(md(source)) as N
+    expect(sig.children.map((c: N) => c.type)).toEqual(['list', 'block'])
+    expect(sig.children[1].fields).toEqual({
+      blockType: 'code',
+      language: 'netlogo',
+      code: 'to setup\n  set heading one-of [0 90 180 270]\n  if random 100 < 3 [ set pcolor green ] ; *not* $math$ <tag>x</tag>\nend',
+    })
+    const back = lexicalToMarkdown(md(source))
+    expect(back.lossy).toEqual([])
+    expect(back.markdown).toBe(source)
+  })
+
+  it('ends a paragraph at a fence and uses a longer fence when the code holds backticks', () => {
+    const sig = signature(md('Příklad:\n```\nshow "a"\n```')) as N
+    expect(sig.children.map((c: N) => c.type)).toEqual(['paragraph', 'block'])
+    expect(sig.children[1].fields.language).toBe('')
+    const tricky = md('````\nprint("```")\n````')
+    expect(lexicalToMarkdown(tricky).markdown).toBe('````\nprint("```")\n````')
+    expect(() => markdownToLexical('```netlogo\nfd 1')).toThrow(/Unclosed/)
+  })
+
   it('reports math KaTeX cannot parse', () => {
     const { mathErrors } = markdownToLexical('Chyba $\\frac{a}$ a $$\\nonexistent{x}$$')
     expect(mathErrors).toHaveLength(2)
@@ -137,6 +169,10 @@ describe('lexicalToMarkdown', () => {
       '1. jedna\n2. dvě',
       '',
       '\\- není seznam, \\$5, \\* a [odkaz](https://x.cz)',
+      '',
+      '```python\ndef f(x):\n    return x * 2\n```',
+      '',
+      '\\`\\`\\` toto není kód',
     ].join('\n')
     const first = lexicalToMarkdown(md(source))
     expect(first.lossy).toEqual([])

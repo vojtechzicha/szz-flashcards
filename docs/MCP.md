@@ -53,6 +53,7 @@ Card faces (`front`, `back`) are Lexical rich text. Tools exchange them as Card 
 | `$…$` | `mathInline` block (KaTeX) |
 | `$$ … $$` on its own line(s) | `math` block (display) |
 | `<tag>Label</tag>` | `tag` inline block |
+| ` ```lang ` … ` ``` ` fence at line start | `code` block (verbatim, monospace `<pre>`) |
 | `\*`, `\$`, `\_`, … | literal character |
 
 Reading a card and writing the same Markdown back preserves its structure; the test suite checks this for all 302

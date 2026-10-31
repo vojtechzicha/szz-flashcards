@@ -103,6 +103,34 @@
   border-color: rgba(255, 255, 255, 0.08);
 }
 
+/* Fenced code (```lang … ```): monospace, whitespace kept, scrolls sideways
+   instead of wrapping so indentation stays readable. */
+.code-block {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--flashcard-radius-sm);
+  padding: 10px 12px;
+  margin: 10px 0;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  line-height: 1.5;
+  white-space: pre;
+  tab-size: 2;
+  text-align: left;
+}
+
+.code-block code {
+  font: inherit;
+  background: none;
+  padding: 0;
+}
+
+.card-back .code-block {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
 .math-inline {
   display: inline-block;
   padding: 0 2px;
