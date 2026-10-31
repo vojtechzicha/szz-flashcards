@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from 'react'
 import katex from 'katex'
 
-import { mathBlockSlug, mathInlineSlug, tagBlockSlug } from './blocks'
+import { codeBlockSlug, mathBlockSlug, mathInlineSlug, tagBlockSlug } from './blocks'
 
 type LexicalNode = {
   type: string
@@ -88,6 +88,14 @@ function renderBlock(node: LexicalNode, key: string): ReactNode {
   }
   if (blockType === mathInlineSlug) {
     return renderMath(String(fields.latex ?? ''), false, key)
+  }
+  if (blockType === codeBlockSlug) {
+    const language = String(fields.language ?? '').trim()
+    return (
+      <pre key={key} className="code-block" data-language={language || undefined}>
+        <code>{String(fields.code ?? '')}</code>
+      </pre>
+    )
   }
   if (blockType === tagBlockSlug) {
     return (

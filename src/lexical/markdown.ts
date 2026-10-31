@@ -2,7 +2,7 @@ import crypto from 'node:crypto'
 
 import katex from 'katex'
 
-import { mathBlockSlug, mathInlineSlug, tagBlockSlug } from './blocks'
+import { codeBlockSlug, mathBlockSlug, mathInlineSlug, tagBlockSlug } from './blocks'
 
 /**
  * Card Markdown: the text format MCP clients (Claude) use to read and write
@@ -16,6 +16,7 @@ import { mathBlockSlug, mathInlineSlug, tagBlockSlug } from './blocks'
  *   Inline            **bold**, *italic*, ~~strike~~, `code`, <u>underline</u>,
  *                     <sub>sub</sub>, <sup>sup</sup>, [text](https://url)
  *   Math              $inline LaTeX$, and a display formula on its own lines: $$ … $$
+ *   Code block        ```lang … ``` fences at the start of a line, content verbatim
  *   Tag pill          <tag>Label</tag>
  *   Escapes           \* \_ \$ \` \[ \< \~ \\ \#
  */
@@ -26,6 +27,7 @@ export const CARD_MARKDOWN_GUIDE = `Card faces are written in Card Markdown:
 - Lists: "- item" or "1. item"; indent by 2 spaces to nest.
 - Inline: **bold**, *italic*, ~~strike~~, \`code\`, <u>underline</u>, <sub>sub</sub>, <sup>sup</sup>, [text](https://url).
 - Math is KaTeX LaTeX: inline $E = mc^2$; a display formula goes on its own line(s) as $$\\frac{a}{b}$$. Wrap words inside math in \\text{…} (Czech diacritics must be in \\text).
+- Code block (monospace, whitespace kept, nothing inside is interpreted): a line \`\`\`lang (language optional, e.g. netlogo), the code lines, then a closing \`\`\` line. Fences start at the beginning of a line, not inside list items.
 - Tag pill (small uppercase label): <tag>Label</tag>.
 - Escape literal characters with a backslash: \\* \\_ \\$ \\\` \\[ \\< \\~ \\\\ \\#.`
 
@@ -106,6 +108,13 @@ const mathBlock = (latex: string): LexNode => ({
   fields: { id: blockId(), blockName: '', blockType: mathBlockSlug, latex },
 })
 
+const codeBlock = (code: string, language: string): LexNode => ({
+  type: 'block',
+  format: '',
+  version: 2,
+  fields: { id: blockId(), blockName: '', blockType: codeBlockSlug, language, code },
+})
+
 const inlineBlock = (blockType: string, fields: Record<string, unknown>): LexNode => ({
   type: 'inlineBlock',
   version: 1,
@@ -142,6 +151,7 @@ export interface MarkdownParseResult {
 
 const LIST_LINE = /^(\s*)([-*+]|\d{1,3}[.)])\s+(.*)$/
 const HEADING_LINE = /^(#{1,6})\s+(.*)$/
+const FENCE_OPEN = /^(`{3,})[ \t]*([\w+#.-]*)[ \t]*$/
 
 export function markdownToLexical(markdown: string): MarkdownParseResult {
   const mathErrors: string[] = []
@@ -155,6 +165,29 @@ export function markdownToLexical(markdown: string): MarkdownParseResult {
 
     if (!trimmed) {
       i++
+      continue
+    }
+
+    // Code block: ```lang … ``` with the content kept verbatim.
+    const fence = FENCE_OPEN.exec(line)
+    if (fence) {
+      const close = new RegExp(`^\`{${fence[1].length},}[ \t]*$`)
+      const body: string[] = []
+      i++
+      let closed = false
+      while (i < lines.length) {
+        const l = lines[i]
+        i++
+        if (close.test(l)) {
+          closed = true
+          break
+        }
+        body.push(l)
+      }
+      if (!closed) throw new CardMarkdownError('Unclosed ``` code block.')
+      const code = body.join('\n').replace(/\s+$/, '')
+      if (!code.trim()) throw new CardMarkdownError('Empty ``` code block.')
+      children.push(codeBlock(code, fence[2]))
       continue
     }
 
@@ -215,7 +248,10 @@ export function markdownToLexical(markdown: string): MarkdownParseResult {
       const l = lines[i]
       const t = l.trim()
       if (!t) break
-      if (paraLines.length > 0 && (t.startsWith('$$') || LIST_LINE.test(l) || (HEADING_LINE.test(t) && !l.startsWith(' ')))) {
+      if (
+        paraLines.length > 0 &&
+        (t.startsWith('$$') || FENCE_OPEN.test(l) || LIST_LINE.test(l) || (HEADING_LINE.test(t) && !l.startsWith(' ')))
+      ) {
         break
       }
       paraLines.push(t)
@@ -566,6 +602,13 @@ function serializeBlock(node: LexNode, lossy: Set<string>): string | null {
     case 'block': {
       const fields = node.fields ?? {}
       if (fields.blockType === mathBlockSlug) return `$$\n${String(fields.latex ?? '').trim()}\n$$`
+      if (fields.blockType === codeBlockSlug) {
+        const code = String(fields.code ?? '').replace(/\s+$/, '')
+        // A fence longer than any backtick run inside the code can't be closed early.
+        const longest = Math.max(0, ...(code.match(/`+/g) ?? []).map((run) => run.length))
+        const fence = '`'.repeat(Math.max(3, longest + 1))
+        return `${fence}${String(fields.language ?? '').trim()}\n${code}\n${fence}`
+      }
       lossy.add(`block ${fields.blockType}`)
       return null
     }
@@ -690,6 +733,7 @@ export function lexicalToPlainText(doc: unknown): string {
     if (typeof node.text === 'string') parts.push(node.text)
     if (node.type === 'linebreak') parts.push(' ')
     if (node.fields?.latex) parts.push(String(node.fields.latex))
+    if (node.fields?.code) parts.push(String(node.fields.code))
     if (node.fields?.label) parts.push(String(node.fields.label))
     for (const child of node.children ?? []) walk(child)
     if (['paragraph', 'heading', 'listitem', 'block'].includes(node.type)) parts.push(' ')

@@ -17,7 +17,7 @@ Multi-deck flashcard study app: Next.js 16 + Payload CMS 3 (single repo, single 
 - `studies` — top-level decks.
 - `subjects` — child of study; `mode = flat | topical` (validated): flat means cards attach directly; topical means cards must belong to a topic under the subject.
 - `topics` — child of subject (only for topical subjects).
-- `cards` — `front` and `back` are Payload Lexical rich text. Custom blocks: `mathBlock` (rendered as `<div class="math-block">`), `fraction` (inline, → `<span class="frac">`), `tag` (inline, → `<span class="tag">`). Frontend renderer is `src/lexical/render.tsx`. Legacy HTML importer is `src/lexical/html-import.ts`.
+- `cards` — `front` and `back` are Payload Lexical rich text. Custom blocks: `mathBlock` (rendered as `<div class="math-block">`), `code` (fenced code, → `<pre class="code-block">`), `fraction` (inline, → `<span class="frac">`), `tag` (inline, → `<span class="tag">`). Frontend renderer is `src/lexical/render.tsx`. Legacy HTML importer is `src/lexical/html-import.ts`.
 - `progress` — per-user per-card state. Composite unique index on `(user, card)`.
 
 ## Learning modes
