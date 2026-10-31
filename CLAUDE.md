@@ -8,6 +8,7 @@ Multi-deck flashcard study app: Next.js 16 + Payload CMS 3 (single repo, single 
 - **Payload 3** is embedded — `src/payload.config.ts` is loaded by `withPayload(nextConfig)` in `next.config.ts`.
 - **MongoDB** via `@payloadcms/db-mongodb`. Local dev uses `docker-compose.yml` (single mongo:8 container). Production is MongoDB Atlas.
 - **Auth**: dual path. Payload's built-in email/password (admins, bootstrap) + Auth.js v5 Google provider (`src/auth.ts`). Both converge on the Payload `users` collection. Google sign-in **only succeeds if the email already exists** in `users` — admin-curated allow-list, no auto-provisioning.
+- **Claude connector (MCP)**: remote MCP server at `/api/mcp` with its own OAuth 2.1 server (`src/lib/mcp/`), so Claude sessions read and edit decks in production. Card faces are exchanged as Card Markdown (`src/lexical/markdown.ts`). See `docs/MCP.md`.
 - **i18n**: bilingual (cs/en). Frontend uses a tiny in-house dictionary (`src/lib/i18n/{cs,en}.json` + provider). Payload admin uses `@payloadcms/translations/languages` (`cs`, `en`). Content (cards, etc.) is stored verbatim, no per-record translation.
 
 ## Data model (Payload collections)
@@ -35,6 +36,8 @@ Session state is React-only (no `sessions` collection). Marks write through to `
 - `src/lexical/{blocks,editor,render,html-import}.ts` — card rich text plumbing.
 - `src/lib/auth/session.ts` — `getCurrentUser()` resolves either auth path.
 - `src/components/LearnSession.tsx` — flip / swipe / keyboard / mark.
+- `src/lib/mcp/` — MCP endpoint plumbing: `oauth.ts` (authorization server), `store.ts` (`mcp_*` Mongo collections), `tools/` (structure, cards, audit).
+- `src/lexical/markdown.ts` — Card Markdown ⇄ Lexical; keep it in sync with the card editor features and blocks.
 - `src/seed/seed-szz.ts` — one-shot import from `legacy/flashcards.js` (302 cards / 9 subjects / 20 topics).
 
 ## Conventions
@@ -51,7 +54,7 @@ cp .env.example .env.local   # then fill PAYLOAD_SECRET, AUTH_SECRET
 pnpm dev                      # auto-starts mongo, runs next dev, stops mongo on exit if it wasn't already up
 # create first admin via Payload first-run at /admin, then:
 pnpm seed                     # imports the legacy SZZ deck
-pnpm vitest                   # unit tests for learning algorithms
+pnpm vitest                   # unit tests (learning algorithms, Card Markdown, MCP OAuth)
 ```
 
 Scripts:

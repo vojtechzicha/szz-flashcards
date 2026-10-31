@@ -10,11 +10,12 @@ export default async function SignInPage({
   searchParams: Promise<{ error?: string; callbackUrl?: string }>
 }) {
   const sp = await searchParams
+  const callbackUrl = safeInternalPath(sp.callbackUrl)
   const user = await getCurrentUser()
-  if (user) redirect('/app')
+  // Already signed in: continue where the sign-in was requested (e.g. Claude's connector consent).
+  if (user) redirect(callbackUrl)
 
   const t = await ServerT()
-  const callbackUrl = safeInternalPath(sp.callbackUrl)
   const errorKey =
     sp.error === 'NotAuthorized' ? t('auth.notAuthorized') : sp.error ? t('auth.invalidCredentials') : null
 

@@ -1,0 +1,175 @@
+import { describe, expect, it } from 'vitest'
+
+import { legacyHtmlToLexical } from './html-import'
+import { lexicalToMarkdown, lexicalToPlainText, markdownToLexical } from './markdown'
+import { loadLegacyData } from '../seed/load-legacy'
+
+type N = Record<string, any>
+
+/** Structure without ids, empty text nodes or split runs, for comparisons. */
+function signature(doc: N): unknown {
+  const clean = (node: N): N | null => {
+    if (node.type === 'text') {
+      if (!node.text) return null
+      return { t: node.text, f: node.format ?? 0 }
+    }
+    const out: N = { type: node.type }
+    if (node.tag) out.tag = node.tag
+    if (node.listType) out.listType = node.listType
+    if (node.fields) {
+      const { id: _id, blockName: _bn, ...fields } = node.fields
+      out.fields = fields
+    }
+    if (node.children) {
+      const kids: N[] = []
+      for (const child of node.children) {
+        const c = clean(child)
+        if (!c) continue
+        const last = kids[kids.length - 1]
+        if (c.t !== undefined && last?.t !== undefined && last.f === c.f) last.t += c.t
+        else kids.push(c)
+      }
+      // Leading/trailing whitespace of a block is not significant.
+      if (['paragraph', 'heading', 'listitem'].includes(node.type)) {
+        if (kids[0]?.t !== undefined) kids[0].t = kids[0].t.replace(/^\s+/, '')
+        const end = kids[kids.length - 1]
+        if (end?.t !== undefined) end.t = end.t.replace(/\s+$/, '')
+        out.children = kids.filter((k) => k.t !== '')
+      } else {
+        out.children = kids
+      }
+      if (node.type === 'paragraph' && out.children.length === 0) return null
+    }
+    return out
+  }
+  return clean(doc.root)
+}
+
+const md = (s: string) => markdownToLexical(s).doc
+
+describe('markdownToLexical', () => {
+  it('builds paragraphs, line breaks and inline formats', () => {
+    const doc = md('**Tučně** a *kurzíva*, ~~škrt~~, `kód`, <u>pod</u>, H<sub>2</sub>O, x<sup>2</sup>\ndruhý řádek\n\nNový odstavec')
+    expect(signature(doc)).toEqual({
+      type: 'root',
+      children: [
+        {
+          type: 'paragraph',
+          children: [
+            { t: 'Tučně', f: 1 },
+            { t: ' a ', f: 0 },
+            { t: 'kurzíva', f: 2 },
+            { t: ', ', f: 0 },
+            { t: 'škrt', f: 4 },
+            { t: ', ', f: 0 },
+            { t: 'kód', f: 16 },
+            { t: ', ', f: 0 },
+            { t: 'pod', f: 8 },
+            { t: ', H', f: 0 },
+            { t: '2', f: 32 },
+            { t: 'O, x', f: 0 },
+            { t: '2', f: 64 },
+            { type: 'linebreak' },
+            { t: 'druhý řádek', f: 0 },
+          ],
+        },
+        { type: 'paragraph', children: [{ t: 'Nový odstavec', f: 0 }] },
+      ],
+    })
+  })
+
+  it('parses math, tags, headings, lists and links', () => {
+    const doc = md(
+      [
+        '### Vzorec',
+        'Platí $E = mc^2$ vždy <tag>Def</tag>',
+        '$$',
+        '\\frac{a}{b}',
+        '$$',
+        '- první',
+        '  - vnořená',
+        '- druhá',
+        '1. číslo',
+        '[odkaz](https://example.com)',
+      ].join('\n'),
+    )
+    const sig = signature(doc) as N
+    expect(sig.children.map((c: N) => c.type)).toEqual(['heading', 'paragraph', 'block', 'list', 'list', 'paragraph'])
+    expect(sig.children[1].children[1]).toEqual({
+      type: 'inlineBlock',
+      fields: { blockType: 'mathInline', latex: 'E = mc^2' },
+    })
+    expect(sig.children[1].children[3]).toEqual({ type: 'inlineBlock', fields: { blockType: 'tag', label: 'Def' } })
+    expect(sig.children[2].fields).toEqual({ blockType: 'math', latex: '\\frac{a}{b}' })
+    expect(sig.children[3].children).toHaveLength(3)
+    expect(sig.children[3].children[1].children[0].type).toBe('list')
+    expect(sig.children[4].listType).toBe('number')
+    expect(sig.children[5].children[0].fields.url).toBe('https://example.com')
+  })
+
+  it('leaves prices, snake_case and escapes alone', () => {
+    const sig = signature(md('Stojí 5 $ a 10 $, soubor my_var_name, \\*hvězda\\*')) as N
+    expect(sig.children[0].children).toEqual([{ t: 'Stojí 5 $ a 10 $, soubor my_var_name, *hvězda*', f: 0 }])
+  })
+
+  it('reports math KaTeX cannot parse', () => {
+    const { mathErrors } = markdownToLexical('Chyba $\\frac{a}$ a $$\\nonexistent{x}$$')
+    expect(mathErrors).toHaveLength(2)
+  })
+
+  it('rejects empty faces and unclosed display math', () => {
+    expect(() => markdownToLexical('   \n ')).toThrow(/empty/)
+    expect(() => markdownToLexical('$$\nx')).toThrow(/Unclosed/)
+  })
+})
+
+describe('lexicalToMarkdown', () => {
+  it('round-trips hand-written Markdown', () => {
+    const source = [
+      '### Nadpis',
+      '',
+      '**Tučně** a ***obojí*** s $\\alpha$ a <tag>Pojem</tag>\nřádek',
+      '',
+      '$$\n\\sum_{i=1}^n i\n$$',
+      '',
+      '- a\n  - b\n- c',
+      '',
+      '1. jedna\n2. dvě',
+      '',
+      '\\- není seznam, \\$5, \\* a [odkaz](https://x.cz)',
+    ].join('\n')
+    const first = lexicalToMarkdown(md(source))
+    expect(first.lossy).toEqual([])
+    expect(first.markdown).toBe(source)
+  })
+
+  it('round-trips every legacy card without loss', async () => {
+    const data = await loadLegacyData()
+    let checked = 0
+    for (const card of data.cards) {
+      for (const html of [card.front, card.back]) {
+        const original = legacyHtmlToLexical(html)
+        const { markdown, lossy } = lexicalToMarkdown(original)
+        expect(lossy).toEqual([])
+        if (!markdown.trim()) continue
+        const back = markdownToLexical(markdown).doc
+        expect(signature(back), markdown).toEqual(signature(original))
+        checked++
+      }
+    }
+    expect(checked).toBeGreaterThan(500)
+  })
+
+  it('flags content Card Markdown cannot express', () => {
+    const { lossy } = lexicalToMarkdown({
+      root: { type: 'root', children: [{ type: 'paragraph', format: 'center', children: [{ type: 'text', text: 'x' }] }] },
+    })
+    expect(lossy).toEqual(['text alignment (center)'])
+  })
+})
+
+describe('lexicalToPlainText', () => {
+  it('joins text, math and tags', () => {
+    expect(lexicalToPlainText(md('A **b**\n\n$$x^2$$\n\n- <tag>T</tag>'))).toBe('A b x^2 T')
+  })
+})
