@@ -27,7 +27,7 @@ export const CARD_MARKDOWN_GUIDE = `Card faces are written in Card Markdown:
 - Lists: "- item" or "1. item"; indent by 2 spaces to nest.
 - Inline: **bold**, *italic*, ~~strike~~, \`code\`, <u>underline</u>, <sub>sub</sub>, <sup>sup</sup>, [text](https://url).
 - Math is KaTeX LaTeX: inline $E = mc^2$; a display formula goes on its own line(s) as $$\\frac{a}{b}$$. Wrap words inside math in \\text{…} (Czech diacritics must be in \\text).
-- Code block (monospace, whitespace kept, nothing inside is interpreted): a line \`\`\`lang, the code lines, then a closing \`\`\` line. The language tag is optional and turns on syntax highlighting for: netlogo, python (py), javascript (js, mongo), typescript (ts), java, c, cpp, csharp (cs), php, r, sql, pgsql, bash (sh), shell, powershell, json, yaml (yml), xml (html), css, markdown (md), dockerfile, ini (toml); any other tag renders as plain monospace. Fences start at the beginning of a line, not inside list items.
+- Code block (monospace, whitespace kept, nothing inside is interpreted): a line \`\`\`lang, the code lines, then a closing \`\`\` line. The language tag is optional and turns on syntax highlighting for: netlogo, cypher (neo4j), python (py), javascript (js, mongo), typescript (ts), java, c, cpp, csharp (cs), php, r, sql, pgsql, bash (sh), shell, powershell, json, yaml (yml), xml (html), css, markdown (md), dockerfile, ini (toml); any other tag renders as plain monospace. Fences start at the beginning of a line, not inside list items.
 - Tag pill (small uppercase label): <tag>Label</tag>.
 - Escape literal characters with a backslash: \\* \\_ \\$ \\\` \\[ \\< \\~ \\\\ \\#.`
 
@@ -151,7 +151,7 @@ export interface MarkdownParseResult {
 
 const LIST_LINE = /^(\s*)([-*+]|\d{1,3}[.)])\s+(.*)$/
 const HEADING_LINE = /^(#{1,6})\s+(.*)$/
-const FENCE_OPEN = /^(`{3,})[ \t]*([\w+#.-]*)[ \t]*$/
+const FENCE_OPEN = /^(`{3,})[ \t]*([^`]*?)[ \t]*$/
 
 export function markdownToLexical(markdown: string): MarkdownParseResult {
   const mathErrors: string[] = []
@@ -185,14 +185,14 @@ export function markdownToLexical(markdown: string): MarkdownParseResult {
         body.push(l)
       }
       if (!closed) throw new CardMarkdownError('Unclosed ``` code block.')
-      const code = body.join('\n').replace(/\s+$/, '')
+      const code = body.join('\n')
       if (!code.trim()) throw new CardMarkdownError('Empty ``` code block.')
       children.push(codeBlock(code, fence[2]))
       continue
     }
 
     // Display math: "$$ … $$" on one line, or opened and closed on their own lines.
-    if (trimmed.startsWith('$$')) {
+    if (isDisplayMathStart(trimmed)) {
       const rest = trimmed.slice(2)
       let latex: string
       const sameLineEnd = rest.lastIndexOf('$$')
@@ -250,7 +250,7 @@ export function markdownToLexical(markdown: string): MarkdownParseResult {
       if (!t) break
       if (
         paraLines.length > 0 &&
-        (t.startsWith('$$') || FENCE_OPEN.test(l) || LIST_LINE.test(l) || (HEADING_LINE.test(t) && !l.startsWith(' ')))
+        (isDisplayMathStart(t) || FENCE_OPEN.test(l) || LIST_LINE.test(l) || (HEADING_LINE.test(t) && !l.startsWith(' ')))
       ) {
         break
       }
@@ -275,6 +275,18 @@ export function markdownToLexical(markdown: string): MarkdownParseResult {
     },
     mathErrors,
   }
+}
+
+/**
+ * A line opens display math when it starts with `$$` and, if it closes on the
+ * same line, nothing follows. `$$x$$2 …` is inline math (the serializer writes
+ * that form when a formula is followed by a digit).
+ */
+function isDisplayMathStart(trimmed: string): boolean {
+  if (!trimmed.startsWith('$$')) return false
+  const rest = trimmed.slice(2)
+  const close = rest.indexOf('$$')
+  return close === -1 || rest.slice(close + 2).trim() === ''
 }
 
 interface ListEntry {
@@ -539,8 +551,8 @@ function parseInline(s: string, mathErrors: string[], format = 0): LexNode[] {
     if (c === '[') {
       const close = findCloser(s, i + 1, ']')
       if (close !== -1 && s[close + 1] === '(') {
-        const urlEnd = s.indexOf(')', close + 2)
-        const url = urlEnd !== -1 ? s.slice(close + 2, urlEnd).trim() : ''
+        const urlEnd = findLinkEnd(s, close + 2)
+        const url = urlEnd !== -1 ? s.slice(close + 2, urlEnd).trim().replace(/\\([()])/g, '$1') : ''
         if (url && /^(https?:|mailto:)/i.test(url)) {
           const label = parseInline(s.slice(i + 1, close), mathErrors, format)
           flush()
@@ -556,6 +568,36 @@ function parseInline(s: string, mathErrors: string[], format = 0): LexNode[] {
   }
   flush()
   return out
+}
+
+/** Index of the `)` closing a link destination starting at `from`; inner parentheses must balance. */
+function findLinkEnd(s: string, from: number): number {
+  let depth = 0
+  for (let j = from; j < s.length; j++) {
+    const ch = s[j]
+    if (ch === '\\') {
+      j++
+    } else if (ch === '(') {
+      depth++
+    } else if (ch === ')') {
+      if (depth === 0) return j
+      depth--
+    } else if (/\s/.test(ch)) {
+      return -1
+    }
+  }
+  return -1
+}
+
+/** Escape parentheses in a URL unless they already balance, so findLinkEnd reads it back whole. */
+function linkDestination(url: string): string {
+  let depth = 0
+  for (const ch of url) {
+    if (ch === '(') depth++
+    else if (ch === ')' && --depth < 0) break
+  }
+  const safe = url.replace(/\s/g, (w) => encodeURIComponent(w))
+  return depth === 0 ? safe : safe.replace(/[()]/g, (p) => `\\${p}`)
 }
 
 function unescapeText(s: string): string {
@@ -603,11 +645,13 @@ function serializeBlock(node: LexNode, lossy: Set<string>): string | null {
       const fields = node.fields ?? {}
       if (fields.blockType === mathBlockSlug) return `$$\n${String(fields.latex ?? '').trim()}\n$$`
       if (fields.blockType === codeBlockSlug) {
-        const code = String(fields.code ?? '').replace(/\s+$/, '')
+        const code = String(fields.code ?? '')
         // A fence longer than any backtick run inside the code can't be closed early.
         const longest = Math.max(0, ...(code.match(/`+/g) ?? []).map((run) => run.length))
         const fence = '`'.repeat(Math.max(3, longest + 1))
-        return `${fence}${String(fields.language ?? '').trim()}\n${code}\n${fence}`
+        const language = String(fields.language ?? '').replace(/`/g, '').trim()
+        if (language !== String(fields.language ?? '').trim()) lossy.add('backticks in code language')
+        return `${fence}${language}\n${code}\n${fence}`
       }
       lossy.add(`block ${fields.blockType}`)
       return null
@@ -654,7 +698,7 @@ const FORMAT_WRAPPERS: Array<[number, string, string]> = [
 
 function serializeInline(nodes: LexNode[], lossy: Set<string>): string {
   let out = ''
-  for (const node of nodes) {
+  for (const [index, node] of nodes.entries()) {
     switch (node.type) {
       case 'text': {
         const format = typeof node.format === 'number' ? node.format : 0
@@ -687,7 +731,13 @@ function serializeInline(nodes: LexNode[], lossy: Set<string>): string {
         break
       case 'inlineBlock': {
         const fields = node.fields ?? {}
-        if (fields.blockType === mathInlineSlug) out += `$${String(fields.latex ?? '').trim()}$`
+        if (fields.blockType === mathInlineSlug) {
+          // `$x$2` wouldn't close (a closing `$` can't precede a digit, so prices
+          // like "$5-$10" stay text); `$$x$$` has no such rule.
+          const next = nodes[index + 1]
+          const delim = next?.type === 'text' && /^\d/.test(next.text ?? '') ? '$$' : '$'
+          out += `${delim}${String(fields.latex ?? '').trim()}${delim}`
+        }
         else if (fields.blockType === tagBlockSlug) out += `<tag>${escapeText(String(fields.label ?? ''))}</tag>`
         else lossy.add(`inline block ${fields.blockType}`)
         break
@@ -695,7 +745,7 @@ function serializeInline(nodes: LexNode[], lossy: Set<string>): string {
       case 'link':
       case 'autolink': {
         const url = node.fields?.url ?? node.url ?? ''
-        out += `[${serializeInline(node.children ?? [], lossy)}](${url})`
+        out += `[${serializeInline(node.children ?? [], lossy)}](${linkDestination(String(url))})`
         break
       }
       default:
