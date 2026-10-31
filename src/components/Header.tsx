@@ -70,6 +70,12 @@ export function Header({ user }: { user: AppUser }) {
           >
             {t('nav.stats')}
           </Link>
+          <Link
+            href="/app/connections"
+            className="px-3 py-1.5 rounded-md hover:bg-[color:var(--color-bg-hover)] text-[color:var(--color-text-dim)] hover:text-[color:var(--color-text)]"
+          >
+            {t('nav.connections')}
+          </Link>
           {user.role === 'admin' ? (
             <Link
               href="/admin"

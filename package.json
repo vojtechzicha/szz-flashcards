@@ -15,6 +15,7 @@
     "seed": "tsx --env-file=.env --tsconfig tsconfig.seed.json src/seed/seed-szz.ts"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
     "@payloadcms/db-mongodb": "^3.84.0",
     "@payloadcms/next": "^3.84.0",
     "@payloadcms/richtext-lexical": "^3.84.0",
@@ -31,7 +32,8 @@
     "payload": "^3.84.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.0",

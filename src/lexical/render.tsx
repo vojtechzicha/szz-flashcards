@@ -113,11 +113,23 @@ function renderNode(node: LexicalNode, key: string): ReactNode {
       const Tag = node.listType === 'number' ? 'ol' : 'ul'
       return <Tag key={key}>{renderChildren(node.children, key)}</Tag>
     }
-    case 'listitem':
-      return <li key={key}>{renderChildren(node.children, key)}</li>
+    case 'listitem': {
+      // Lexical keeps a nested list in its own list item; don't give that one a marker.
+      const nestedOnly = node.children?.length === 1 && node.children[0].type === 'list'
+      return (
+        <li key={key} style={nestedOnly ? { listStyle: 'none' } : undefined}>
+          {renderChildren(node.children, key)}
+        </li>
+      )
+    }
     case 'link':
       return (
-        <a key={key} href={node.url ?? '#'} target="_blank" rel="noreferrer">
+        <a
+          key={key}
+          href={String(node.fields?.url ?? node.url ?? '#')}
+          target="_blank"
+          rel="noreferrer"
+        >
           {renderChildren(node.children, key)}
         </a>
       )

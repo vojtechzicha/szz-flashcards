@@ -66,6 +66,11 @@ Cards have **rich-text** front/back fields with a curated toolbar:
 
 Frontend renders these as the legacy `.math-block`, `.frac`, `.tag` classes so the existing CSS-only formula styling carries over verbatim.
 
+## Claude connector
+
+Claude can read and edit the decks through a remote MCP server at `/api/mcp` (OAuth, admin-only writes, audit log).
+Setup and tool list: [docs/MCP.md](docs/MCP.md).
+
 ## Languages
 
 UI is fully bilingual (Czech / English). Toggle in the top-right; the choice is persisted in the user's Payload record. Default language follows the browser's `Accept-Language` header.
