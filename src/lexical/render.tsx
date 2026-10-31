@@ -2,6 +2,7 @@ import { Fragment, type ReactNode } from 'react'
 import katex from 'katex'
 
 import { codeBlockSlug, mathBlockSlug, mathInlineSlug, tagBlockSlug } from './blocks'
+import { highlightCode } from './highlight'
 
 type LexicalNode = {
   type: string
@@ -91,9 +92,15 @@ function renderBlock(node: LexicalNode, key: string): ReactNode {
   }
   if (blockType === codeBlockSlug) {
     const language = String(fields.language ?? '').trim()
+    const code = String(fields.code ?? '')
+    const highlighted = highlightCode(code, language)
     return (
       <pre key={key} className="code-block" data-language={language || undefined}>
-        <code>{String(fields.code ?? '')}</code>
+        {highlighted !== null ? (
+          <code className="hljs" dangerouslySetInnerHTML={{ __html: highlighted }} />
+        ) : (
+          <code>{code}</code>
+        )}
       </pre>
     )
   }

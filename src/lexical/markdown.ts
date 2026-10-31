@@ -27,7 +27,7 @@ export const CARD_MARKDOWN_GUIDE = `Card faces are written in Card Markdown:
 - Lists: "- item" or "1. item"; indent by 2 spaces to nest.
 - Inline: **bold**, *italic*, ~~strike~~, \`code\`, <u>underline</u>, <sub>sub</sub>, <sup>sup</sup>, [text](https://url).
 - Math is KaTeX LaTeX: inline $E = mc^2$; a display formula goes on its own line(s) as $$\\frac{a}{b}$$. Wrap words inside math in \\text{…} (Czech diacritics must be in \\text).
-- Code block (monospace, whitespace kept, nothing inside is interpreted): a line \`\`\`lang (language optional, e.g. netlogo), the code lines, then a closing \`\`\` line. Fences start at the beginning of a line, not inside list items.
+- Code block (monospace, whitespace kept, nothing inside is interpreted): a line \`\`\`lang, the code lines, then a closing \`\`\` line. The language tag is optional and turns on syntax highlighting for: netlogo, python (py), javascript (js, mongo), typescript (ts), java, c, cpp, csharp (cs), php, r, sql, pgsql, bash (sh), shell, powershell, json, yaml (yml), xml (html), css, markdown (md), dockerfile, ini (toml); any other tag renders as plain monospace. Fences start at the beginning of a line, not inside list items.
 - Tag pill (small uppercase label): <tag>Label</tag>.
 - Escape literal characters with a backslash: \\* \\_ \\$ \\\` \\[ \\< \\~ \\\\ \\#.`
 
