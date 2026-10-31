@@ -126,6 +126,43 @@
   padding: 0;
 }
 
+/* Syntax colours for highlighted code (highlight.js tokens, see
+   src/lexical/highlight.ts). Tuned for the cream card surface. */
+.code-block .hljs-keyword,
+.code-block .hljs-selector-tag,
+.code-block .hljs-doctag { color: #8a3ffc; font-weight: 600; }
+.code-block .hljs-built_in,
+.code-block .hljs-title.function_,
+.code-block .hljs-title.class_,
+.code-block .hljs-title { color: #0b62a3; }
+.code-block .hljs-string,
+.code-block .hljs-regexp,
+.code-block .hljs-template-tag,
+.code-block .hljs-selector-attr { color: #2f7d32; }
+.code-block .hljs-number,
+.code-block .hljs-literal,
+.code-block .hljs-symbol,
+.code-block .hljs-bullet { color: #b45309; }
+.code-block .hljs-variable,
+.code-block .hljs-template-variable,
+.code-block .hljs-attr,
+.code-block .hljs-attribute,
+.code-block .hljs-property,
+.code-block .hljs-params { color: #a1366d; }
+.code-block .hljs-type,
+.code-block .hljs-name,
+.code-block .hljs-selector-class,
+.code-block .hljs-selector-id { color: #0f766e; }
+.code-block .hljs-comment,
+.code-block .hljs-quote { color: #7c7368; font-style: italic; }
+.code-block .hljs-meta { color: #6b5b95; }
+.code-block .hljs-punctuation,
+.code-block .hljs-operator { color: #57514a; }
+.code-block .hljs-deletion { color: #b3261e; }
+.code-block .hljs-addition { color: #2f7d32; }
+.code-block .hljs-emphasis { font-style: italic; }
+.code-block .hljs-strong { font-weight: 700; }
+
 .card-back .code-block {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.08);
