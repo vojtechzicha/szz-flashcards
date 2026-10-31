@@ -1,6 +1,8 @@
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { getCurrentUser } from '@/lib/auth/session'
+import { payloadClient } from '@/lib/payload-client'
 import { ServerT } from '@/lib/i18n/server'
 import { SignInForm } from '@/components/SignInForm'
 
@@ -12,8 +14,15 @@ export default async function SignInPage({
   const sp = await searchParams
   const callbackUrl = safeInternalPath(sp.callbackUrl)
   const user = await getCurrentUser()
-  // Already signed in: continue where the sign-in was requested (e.g. Claude's connector consent).
-  if (user) redirect(callbackUrl)
+  if (user) {
+    // Already signed in: continue where the sign-in was requested (admin, Claude's
+    // connector consent). If only the Google session is left, Payload's cookie
+    // must be re-issued first or /admin would send us straight back here.
+    const payload = await payloadClient()
+    const payloadAuth = await payload.auth({ headers: await headers() })
+    if (payloadAuth.user) redirect(callbackUrl)
+    redirect(`/sign-in/continue?callbackUrl=${encodeURIComponent(callbackUrl)}`)
+  }
 
   const t = await ServerT()
   const errorKey =
