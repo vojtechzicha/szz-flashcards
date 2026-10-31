@@ -247,6 +247,8 @@ export const cardTools = [
       const byId = new Map(existing.map((c) => [String(c.id), c]))
       const resolver = new PlacementResolver(payload, opts)
       const problems: string[] = []
+      // Next free order per destination, so cards moved together keep their sequence.
+      const nextInScope = new Map<string, number>()
       const planned: Array<{ id: string; before: ReturnType<typeof cardOut>; data: Record<string, any>; changes: Record<string, unknown> }> = []
 
       for (const [i, u] of updates.entries()) {
@@ -281,7 +283,10 @@ export const cardTools = [
                 to: { subject_id: subjectId, topic_id: topicId },
               }
               if (u.order === undefined) {
-                data.order = await nextOrder(payload, opts, 'cards', scopeWhere(placement))
+                const key = scopeKey(placement)
+                if (!nextInScope.has(key)) nextInScope.set(key, await nextOrder(payload, opts, 'cards', scopeWhere(placement)))
+                data.order = nextInScope.get(key)!
+                nextInScope.set(key, data.order + 1)
                 changes.order = { from: before.order, to: data.order }
               }
             }

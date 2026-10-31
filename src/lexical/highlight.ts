@@ -85,8 +85,47 @@ function netlogo(hl: HLJSApi): Language {
   }
 }
 
+/** Cypher (Neo4j, NOSQ). Not bundled with highlight.js either. */
+function cypher(hl: HLJSApi): Language {
+  return {
+    name: 'Cypher',
+    case_insensitive: true,
+    keywords: {
+      keyword: [
+        'match', 'optional', 'where', 'return', 'with', 'unwind', 'create', 'merge', 'delete',
+        'detach', 'set', 'remove', 'order', 'by', 'asc', 'ascending', 'desc', 'descending', 'skip',
+        'limit', 'distinct', 'union', 'all', 'call', 'yield', 'as', 'on', 'case', 'when', 'then',
+        'else', 'end', 'and', 'or', 'xor', 'not', 'in', 'is', 'starts', 'ends', 'contains',
+        'exists', 'foreach', 'load', 'csv', 'from', 'headers', 'index', 'constraint', 'unique',
+        'for', 'require', 'drop', 'show', 'use', 'shortestpath', 'allshortestpaths',
+      ],
+      built_in: [
+        'count', 'collect', 'sum', 'avg', 'min', 'max', 'size', 'length', 'type', 'id',
+        'elementid', 'labels', 'keys', 'properties', 'nodes', 'relationships', 'head', 'last',
+        'tail', 'range', 'coalesce', 'tostring', 'tointeger', 'tofloat', 'toboolean', 'tolower',
+        'toupper', 'trim', 'split', 'substring', 'replace', 'abs', 'round', 'floor', 'ceil',
+        'sqrt', 'rand', 'date', 'datetime', 'timestamp', 'duration', 'point', 'distance',
+      ],
+      literal: ['true', 'false', 'null'],
+    },
+    contains: [
+      hl.C_LINE_COMMENT_MODE,
+      hl.C_BLOCK_COMMENT_MODE,
+      hl.QUOTE_STRING_MODE,
+      hl.APOS_STRING_MODE,
+      { scope: 'number', match: /\b\d+(\.\d+)?\b/ },
+      // :Label and :REL_TYPE
+      { scope: 'type', match: /:\s*`?[A-Za-z_][A-Za-z0-9_]*`?/ },
+      { scope: 'variable', match: /\$[A-Za-z_][A-Za-z0-9_]*/ },
+      { scope: 'operator', match: /-\[|\]->?|<-\[|-->|<--|->|<-|=~|<>|[=<>+*/%^]/ },
+      { scope: 'punctuation', match: /[()[\]{},.]/ },
+    ],
+  }
+}
+
 const LANGUAGES: Record<string, (hl: HLJSApi) => Language> = {
   netlogo,
+  cypher,
   bash,
   shell,
   powershell,
@@ -113,6 +152,7 @@ const LANGUAGES: Record<string, (hl: HLJSApi) => Language> = {
 
 for (const [name, grammar] of Object.entries(LANGUAGES)) hljs.registerLanguage(name, grammar)
 hljs.registerAliases(['nlogo', 'nls'], { languageName: 'netlogo' })
+hljs.registerAliases(['neo4j'], { languageName: 'cypher' })
 hljs.registerAliases(['mongo', 'mongodb', 'mongosh'], { languageName: 'javascript' })
 hljs.registerAliases(['text', 'txt', 'none'], { languageName: 'plaintext' })
 

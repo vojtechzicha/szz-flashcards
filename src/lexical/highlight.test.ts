@@ -15,6 +15,13 @@ describe('highlightCode', () => {
     expect(html).toContain('&lt;')
   })
 
+  it('highlights Cypher labels, keywords and functions', () => {
+    const html = highlightCode('MATCH (p:Person)-[:KNOWS]->(f) WHERE p.age > 30 RETURN count(f)', 'cypher')!
+    expect(html).toContain('<span class="hljs-keyword">MATCH</span>')
+    expect(html).toContain('<span class="hljs-type">:Person</span>')
+    expect(html).toContain('<span class="hljs-built_in">count</span>')
+  })
+
   it('accepts aliases and is case-insensitive about the tag', () => {
     expect(highlightCode('x = 1', 'PY')).toContain('hljs-number')
     expect(highlightCode('db.users.find({})', 'mongo')).not.toBeNull()

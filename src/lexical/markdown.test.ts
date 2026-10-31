@@ -46,6 +46,11 @@ function signature(doc: N): unknown {
 }
 
 const md = (s: string) => markdownToLexical(s).doc
+const linkTo = (url: string, text: string) => ({
+  type: 'link',
+  fields: { linkType: 'custom', url },
+  children: [{ type: 'text', text, format: 0 }],
+})
 
 describe('markdownToLexical', () => {
   it('builds paragraphs, line breaks and inline formats', () => {
@@ -144,6 +149,33 @@ describe('markdownToLexical', () => {
     expect(() => markdownToLexical('```netlogo\nfd 1')).toThrow(/Unclosed/)
   })
 
+  it('keeps balanced parentheses in link destinations', () => {
+    const url = 'https://en.wikipedia.org/wiki/Function_(mathematics)'
+    const sig = signature(md(`[funkce](${url}) a dál`)) as N
+    expect(sig.children[0].children[0].fields.url).toBe(url)
+    expect(sig.children[0].children[1]).toEqual({ t: ' a dál', f: 0 })
+    // Unbalanced parentheses are escaped on the way out and read back whole.
+    const odd = { root: { type: 'root', children: [{ type: 'paragraph', children: [linkTo('https://x.cz/a)b', 'x')] }] } }
+    const mdOdd = lexicalToMarkdown(odd).markdown
+    expect((signature(md(mdOdd)) as N).children[0].children[0].fields.url).toBe('https://x.cz/a)b')
+  })
+
+  it('keeps fenced code byte for byte, including trailing whitespace and odd language labels', () => {
+    const doc = {
+      root: {
+        type: 'root',
+        children: [{ type: 'block', fields: { blockType: 'code', language: 'Visual Basic', code: 'value  \n\n' } }],
+      },
+    }
+    const { markdown, lossy } = lexicalToMarkdown(doc)
+    expect(lossy).toEqual([])
+    expect((signature(md(markdown)) as N).children[0].fields).toEqual({
+      blockType: 'code',
+      language: 'Visual Basic',
+      code: 'value  \n\n',
+    })
+  })
+
   it('reports math KaTeX cannot parse', () => {
     const { mathErrors } = markdownToLexical('Chyba $\\frac{a}$ a $$\\nonexistent{x}$$')
     expect(mathErrors).toHaveLength(2)
@@ -194,6 +226,27 @@ describe('lexicalToMarkdown', () => {
       }
     }
     expect(checked).toBeGreaterThan(500)
+  })
+
+  it('keeps inline math that is directly followed by a digit', () => {
+    const doc = {
+      root: {
+        type: 'root',
+        children: [
+          {
+            type: 'paragraph',
+            children: [
+              { type: 'inlineBlock', fields: { blockType: 'mathInline', latex: 'x' } },
+              { type: 'text', text: '2 je druhá mocnina', format: 0 },
+            ],
+          },
+        ],
+      },
+    }
+    const { markdown } = lexicalToMarkdown(doc)
+    expect(signature(md(markdown))).toEqual(signature(doc))
+    // Prices stay text.
+    expect((signature(md('od $5-$10')) as N).children[0].children).toEqual([{ t: 'od $5-$10', f: 0 }])
   })
 
   it('flags content Card Markdown cannot express', () => {
